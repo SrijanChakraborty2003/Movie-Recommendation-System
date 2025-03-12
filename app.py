@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -11,10 +10,18 @@ def load_data():
 
 df = load_data()
 
-st.title("Movie Recommender System")
+st.title("🎬 Movie Recommendation System")
+
+# Sidebar Inputs
+min_rating = st.slider("Select Minimum Rating", 0.0, 5.0, 3.5, 0.1)
+genre = st.selectbox("Select Genre", df['genres'].str.split('|').explode().unique())
+num_recommendations = st.slider("Number of Recommendations", 1, 20, 5)
+
+# Filtering based on minimum rating and genre
+filtered_df = df[(df['rating'] >= min_rating) & (df['genres'].str.contains(genre, na=False))]
 
 # Pivot Table
-user_movie_ratings = df.pivot(index='userId', columns='title', values='rating')
+user_movie_ratings = filtered_df.pivot(index='userId', columns='title', values='rating')
 
 # Fill missing values
 user_means = user_movie_ratings.mean(axis=1)
@@ -28,13 +35,12 @@ U, sigma, Vt = svds(matrix, k=50)
 sigma = np.diag(sigma)
 
 # Recommendation Function
-def recommend_movies(user_id, num_recommendations=5):
-    user_ratings_pred = np.dot(np.dot(U[user_id-1], sigma), Vt)
-    user_ratings_pred_df = pd.DataFrame(user_ratings_pred, index=user_movie_ratings.columns, columns=["Predicted Rating"])
-    top_recommendations = user_ratings_pred_df.sort_values("Predicted Rating", ascending=False).head(num_recommendations)
-    return top_recommendations
+def recommend_movies(num_recommendations=5):
+    avg_ratings = user_movie_ratings.mean(axis=0).sort_values(ascending=False)
+    return avg_ratings.head(num_recommendations)
 
-# User Input
-user_id = st.number_input("Enter User ID:", min_value=1, max_value=len(user_movie_ratings), step=1)
-if st.button("Recommend"):
-    st.write(recommend_movies(user_id))
+# Display Recommendations
+if st.button("Get Recommendations"):
+    recommendations = recommend_movies(num_recommendations)
+    st.write("🎥 **Top Movie Recommendations**:")
+    st.write(recommendations)
