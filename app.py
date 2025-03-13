@@ -50,8 +50,8 @@ st.write("Vt Shape:", Vt.shape)
 if matrix.shape != (U.shape[0], Vt.shape[1]):
     raise ValueError(f"Shape mismatch: user_movie_ratings {matrix.shape}, expected {U.shape[0], Vt.shape[1]}")
 
-# ✅ Apply SVD correctly
-predicted_ratings = np.dot(U, np.dot(sigma, Vt))
+# ✅ Correct SVD Multiplication
+predicted_ratings = np.dot(U, np.dot(sigma, Vt))  # 🔥 Fix here
 predicted_ratings_df = pd.DataFrame(predicted_ratings, index=user_movie_ratings.index, columns=user_movie_ratings.columns)
 
 # Step 5: Apply Filtering AFTER Predictions
