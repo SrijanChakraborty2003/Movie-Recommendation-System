@@ -14,7 +14,7 @@ df = load_data()
 @st.cache_resource
 def load_svd_model():
     U, sigma, Vt, original_user_ids, original_movie_titles = joblib.load("svd_model.pkl")
-    sigma = np.diag(sigma)  # Convert sigma back to diagonal matrix
+    sigma = np.diag(sigma)  # ✅ Convert sigma from (80,) to (80,80)
     return U, sigma, Vt, original_user_ids, original_movie_titles
 
 U, sigma, Vt, original_user_ids, original_movie_titles = load_svd_model()
@@ -34,8 +34,6 @@ user_movie_ratings = user_movie_ratings.fillna(user_movie_ratings.stack().mean()
 
 # Step 3: Ensure Shape Matches SVD Training Data
 user_movie_ratings = user_movie_ratings.reindex(index=original_user_ids, columns=original_movie_titles, fill_value=0)
-
-# Drop extra users/movies that weren’t in training
 user_movie_ratings = user_movie_ratings.loc[original_user_ids, original_movie_titles]
 
 # Convert to NumPy array
@@ -48,11 +46,11 @@ st.write("U Shape:", U.shape)
 st.write("Sigma Shape:", sigma.shape)
 st.write("Vt Shape:", Vt.shape)
 
-# Ensure correct shape before applying SVD
+# ✅ Ensure correct shape before applying SVD
 if matrix.shape != (U.shape[0], Vt.shape[1]):
     raise ValueError(f"Shape mismatch: user_movie_ratings {matrix.shape}, expected {U.shape[0], Vt.shape[1]}")
 
-# Apply SVD
+# ✅ Apply SVD correctly
 predicted_ratings = np.dot(np.dot(U, sigma), Vt)
 predicted_ratings_df = pd.DataFrame(predicted_ratings, index=user_movie_ratings.index, columns=user_movie_ratings.columns)
 
