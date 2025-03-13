@@ -37,6 +37,19 @@ user_movie_ratings = user_movie_ratings.reindex(index=original_user_ids, columns
 
 # Step 4: Convert to NumPy and Apply SVD
 matrix = user_movie_ratings.values
+
+# # 🔍 Debugging - Check Shape Before SVD
+# print("User-Movie Ratings Shape:", user_movie_ratings.shape)
+# print("Matrix Shape Before SVD:", matrix.shape)
+# print("U Shape:", U.shape)
+# print("Sigma Shape:", sigma.shape)
+# print("Vt Shape:", Vt.shape)
+
+# Ensure correct shape before applying SVD
+if matrix.shape != (U.shape[0], Vt.shape[1]):
+    raise ValueError(f"Shape mismatch: user_movie_ratings {matrix.shape}, expected {U.shape[0], Vt.shape[1]}")
+
+# Apply SVD
 predicted_ratings = np.dot(np.dot(U, sigma), Vt)
 predicted_ratings_df = pd.DataFrame(predicted_ratings, index=user_movie_ratings.index, columns=user_movie_ratings.columns)
 
