@@ -9,7 +9,7 @@ df = load_data()
 @st.cache_resource
 def load_svd_model():
     U, sigma, Vt = joblib.load("svd_model.pkl")
-    sigma = np.diag(sigma)  # Convert sigma back to a diagonal matrix
+    sigma = np.diag(sigma)
     return U, sigma, Vt
 U, sigma, Vt = load_svd_model()
 st.title(" Movie Recommendation System")
@@ -20,7 +20,8 @@ filtered_df = df[(df['rating'] >= min_rating) & (df['genres'].str.contains(genre
 user_movie_ratings = filtered_df.pivot(index='userId', columns='title', values='rating')
 user_means = user_movie_ratings.mean(axis=1)
 user_movie_ratings = user_movie_ratings.apply(lambda row: row.fillna(row.mean()), axis=1)
-sigma = np.diag(sigma)
+user_movie_ratings = user_movie_ratings.fillna(user_movie_ratings.stack().mean())
+# sigma = np.diag(sigma)
 predicted_ratings = np.dot(np.dot(U, sigma), Vt)
 predicted_ratings_df = pd.DataFrame(predicted_ratings, index=user_movie_ratings.index, columns=user_movie_ratings.columns)
 def recommend_movies(num_recommendations=5):
