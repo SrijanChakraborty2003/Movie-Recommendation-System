@@ -32,22 +32,21 @@ user_movie_ratings = df.pivot(index='userId', columns='title', values='rating')
 user_movie_ratings = user_movie_ratings.apply(lambda row: row.fillna(row.mean()), axis=1)
 user_movie_ratings = user_movie_ratings.fillna(user_movie_ratings.stack().mean())
 
-# Step 3: Align with Original SVD Shape
-# Ensure user IDs and movie titles match the SVD-trained shape
+# Step 3: Ensure Shape Matches SVD Training Data
 user_movie_ratings = user_movie_ratings.reindex(index=original_user_ids, columns=original_movie_titles, fill_value=0)
 
-# Drop extra users/movies if they exist
+# Drop extra users/movies that weren’t in training
 user_movie_ratings = user_movie_ratings.loc[original_user_ids, original_movie_titles]
 
-# Step 4: Convert to NumPy and Apply SVD
-matrix = user_movie_ratings.values
+# Convert to NumPy array
+matrix = user_movie_ratings.to_numpy()
 
-# # 🔍 Debugging - Check Shape Before SVD
-# print("User-Movie Ratings Shape:", user_movie_ratings.shape)
-# print("Matrix Shape Before SVD:", matrix.shape)
-# print("U Shape:", U.shape)
-# print("Sigma Shape:", sigma.shape)
-# print("Vt Shape:", Vt.shape)
+# 🔍 Debugging - Check Shape Before SVD
+st.write("User-Movie Ratings Shape:", user_movie_ratings.shape)
+st.write("Matrix Shape Before SVD:", matrix.shape)
+st.write("U Shape:", U.shape)
+st.write("Sigma Shape:", sigma.shape)
+st.write("Vt Shape:", Vt.shape)
 
 # Ensure correct shape before applying SVD
 if matrix.shape != (U.shape[0], Vt.shape[1]):
