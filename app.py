@@ -8,7 +8,9 @@ def load_data():
 df = load_data()
 @st.cache_resource
 def load_svd_model():
-    return joblib.load("svd_model.pkl")
+    U, sigma, Vt = joblib.load("svd_model.pkl")
+    sigma = np.diag(sigma)  # Convert sigma back to a diagonal matrix
+    return U, sigma, Vt
 U, sigma, Vt = load_svd_model()
 st.title(" Movie Recommendation System")
 min_rating = st.slider("Select Minimum Rating", 0.0, 5.0, 3.5, 0.1)
