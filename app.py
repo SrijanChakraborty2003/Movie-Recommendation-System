@@ -33,7 +33,11 @@ user_movie_ratings = user_movie_ratings.apply(lambda row: row.fillna(row.mean())
 user_movie_ratings = user_movie_ratings.fillna(user_movie_ratings.stack().mean())
 
 # Step 3: Align with Original SVD Shape
+# Ensure user IDs and movie titles match the SVD-trained shape
 user_movie_ratings = user_movie_ratings.reindex(index=original_user_ids, columns=original_movie_titles, fill_value=0)
+
+# Drop extra users/movies if they exist
+user_movie_ratings = user_movie_ratings.loc[original_user_ids, original_movie_titles]
 
 # Step 4: Convert to NumPy and Apply SVD
 matrix = user_movie_ratings.values
